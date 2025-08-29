@@ -1,0 +1,77 @@
+/* Mengatur border untuk beberapa elemen */
+.gariskotak, .gariskotak2, .gariskotak3 {
+    border: 2px solid black;
+    box-sizing: border-box;
+  }
+  
+  .gariskotak, .gariskotak2 {
+    border-right: 0.5px solid black;
+  }
+  
+  .gariskotak3 {
+    border-right: 2px solid black;
+  }
+  
+  /* Header container untuk menyelaraskan gambar dan tabel */
+  .header-container {
+    display: table;
+    align-items: stretch;
+    width: 100%;
+  
+    .gariskotak, .gariskotak2 {
+      flex: 1;
+    }
+  }
+  
+  /* Styling tabel */
+  .table2 {
+    width: 100% !important;
+    border-collapse: collapse;
+  
+    th, td {
+      border: 2px solid black;
+      padding: 10px;
+      vertical-align: middle;
+    }
+  
+    input, textarea {
+      width: 100%;
+      border: none;
+      outline: none;
+      box-sizing: border-box;
+    }
+  }
+  
+  /* Styling untuk menghilangkan panah dropdown */
+  select {
+    appearance: none;        /* Untuk browser modern */
+    -webkit-appearance: none; /* Untuk Chrome & Safari */
+    -moz-appearance: none;    /* Untuk Firefox */
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 16px;
+    width: 60px;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  /* Custom wrapper untuk dropdown */
+  .custom-select-wrapper {
+    position: relative;
+    display: inline-block;
+  
+    &::after {
+      content: "\25BC"; /* Simbol panah custom */
+      font-size: 14px;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none; /* Agar klik tetap ke select */
+    }
+  }
+  
+
+
+  

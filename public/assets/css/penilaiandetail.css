@@ -1,0 +1,116 @@
+
+
+
+.table,p{
+    font-size: 12px !important;
+}
+.form-container{
+    font-size: 12px; 
+}
+
+input,textarea {
+    font-size: 12px !important; 
+}
+
+        /* Untuk Chrome, Safari, Edge, dan Opera */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Untuk Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+.error {
+  color: red;
+}
+    body {
+        font-family: Tahoma;
+    }
+    .table2 {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top:20px;
+        margin-top: 20px;
+    }
+
+    .th2, .td2 {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+    .th2 {
+        background-color: #f2f2f2;
+    }
+    .table-responsive {
+        overflow-x: auto; /* Agar bisa di-scroll saat layar kecil */
+    }
+    /* Form dan Layout */
+    .form-container {
+        margin: 20px;
+    }
+    .checkbox-container {
+        display: flex;
+        gap: 10px;
+    }
+
+    /* Border Box */
+    .gariskotak {
+        border: 2px solid black;
+        border-right: 0.5px solid black;
+    }
+    .gariskotak2 {
+        border: 2px solid black;
+        border-right: 0.5px solid black;
+    }
+    .gariskotak3 {
+        border: 2px solid black;
+        border-right: 2px solid black;
+    }
+
+    /* Form Styling */
+    .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .form-group label {
+        width: 150px; /* Lebar label agar sejajar */
+        text-align: left;
+        font-weight: bold;
+    }
+    .form-group input,textarea {
+        flex: 1;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        
+    }
+ 
+
+    .form-group .separator {
+        margin-right: 5px;
+    }
+
+
+.container_app {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Jarak antara teks dan checkbox */
+}
+
+/* .container_app label {
+    margin-bottom: 0; /* Hilangkan margin default */
+/*}*/
+
+    textarea {
+    margin-top: 10px; /* Atur jarak sesuai kebutuhan */
+    } */
+
+    .wrapper {
+display: flex;
+flex-direction: column; /* Menyusun elemen secara vertikal */
+}
