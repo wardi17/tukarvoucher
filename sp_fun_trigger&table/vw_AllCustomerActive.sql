@@ -17,7 +17,7 @@ UNION ALL
 
 SELECT CustomerID, CustName, 'bambi-bmi' AS SourceDB
 FROM [bambi-bmi].[dbo].[customer]
-WHERE custStatus = 1;
+WHERE custStatus = 1
 GO
 
 -- Untuk menampilkan data:

@@ -181,7 +181,15 @@ date_default_timezone_set('Asia/Jakarta');
 
     public function listdata() {
         
-       
+        $toko     = $_SESSION['tokomerchant'];
+        $username = $_SESSION['username'] ;
+
+        $kodeisi ="";
+        if($toko !== "full"){
+            $kodeisi =" WHERE  a.Toko_merchant='{$toko}' AND  a.User_tukar_voucher ='{$username}'";
+        }
+
+
         try {
             $query = "SELECT 
                 a.Kode_Tukar,
@@ -201,7 +209,8 @@ date_default_timezone_set('Asia/Jakarta');
                     , 1, 1, '') AS Vouchers
                 ) AS Vouchers
             FROM 
-                $this->table_ts AS a
+                $this->table_ts AS a 
+                 {$kodeisi}  
             ORDER BY 
                 a.Date_tukar_voucher DESC;
             ";

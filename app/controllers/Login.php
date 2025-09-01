@@ -34,42 +34,109 @@ class Login extends Controller
         $_SESSION['username']      = $result['data']['username'];
         $_SESSION['session_login'] = 'sudah_login';
 
-        /**
-         * Level User:
-         * - full     → Dashboard, Berikan Voucher, Tukar Voucher
-         * - giver    → Hanya Berikan Voucher
-         * - redeemer → Hanya Tukar Voucher
-         */
-        $userConfig = array(
-            'wardi' => array(
-                'tokomerchant' => 'KK',
-                'level'        => 'full',       // semua menu
-                'redirect'     => base_url . '/home'
-            ),
-            'herman' => array(
-                'tokomerchant' => 'BMN',
-                'level'        => 'giver',      // hanya berikan voucher
-                'redirect'     => base_url . '/tsberikanvoucher'
-            ),
-            'weelan' => array(
-                'tokomerchant' => 'BMI',
-                'level'        => 'redeemer',   // hanya tukar voucher
-                'redirect'     => base_url . '/tstukarvoucher'
-            )
-        );
+       /**
+             * Level User:
+             * - full     → Dashboard, Berikan Voucher, Tukar Voucher (tokomerchant & customer)
+             * - giver    → Hanya Berikan Voucher (customer)
+             * - redeemer → Hanya Tukar Voucher (tokomerchant)
+             */
+                $userConfig = array(
+                    'herman' => array(
+                        'tokomerchant' => 'full',
+                        'level'        => 'full',
+                        'redirect'     => base_url . '/home'
+                    ),
+                     'wardi' => array(
+                        'tokomerchant' => 'HC',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/home'
+                    ),
 
-        $username = $result['data']['username'];
+                    'liana' => array(
+                        'tokomerchant' => 'KK',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/tstukarvoucher'
+                    ),
+                    'ratna' => array(
+                        'tokomerchant' => 'KK',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/tstukarvoucher'
+                    ),
+                    //HC
+                    'endang' => array(
+                        'tokomerchant' => 'HC',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/tstukarvoucher'
+                    ),
 
-        // 4. Jika user ada di mapping → gunakan setting, jika tidak → default full access
-        if (isset($userConfig[$username])) {
-            $_SESSION['tokomerchant'] = $userConfig[$username]['tokomerchant'];
-            $_SESSION['level']        = $userConfig[$username]['level'];
-            header('Location: ' . $userConfig[$username]['redirect']);
-        } else {
-            // Default jika user tidak di-mapping khusus
-               header('Location: ' . base_url . '/login');
-            exit;
-        }
+                    //MB
+                    'helat' => array(
+                        'tokomerchant' => 'MB',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/tstukarvoucher'
+                    ),
+                    'yuli' => array(
+                        'tokomerchant' => 'MB',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/tstukarvoucher'
+                    ),
+                    //BTOUR
+                    'monica' => array(
+                        'tokomerchant' => 'BTOUR',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/tstukarvoucher'
+                    ),
+                    //BMN
+                    'fayziah' => array(
+                        'tokomerchant' => 'BMN',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/tstukarvoucher'
+                    ),
+                    'jerry' => array(
+                        'tokomerchant' => 'BMN',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/tstukarvoucher'
+                    ),
+                    'weelan' => array(
+                        'tokomerchant' => 'BMI',
+                        'level'        => 'redeemer',
+                        'redirect'     => base_url . '/tstukarvoucher'
+                    ),
+
+                    //giver berikan voucher (CUSTOMER)
+                    //DKI
+                    'diana' => array(
+                        'tokomerchant' => 'customer',
+                        'level'        => 'giver',
+                        'redirect'     => base_url . '/tsberikanvoucher'
+                    ),
+                    //JBR
+                    'susan' => array(
+                        'tokomerchant' => 'customer',
+                        'level'        => 'giver',
+                        'redirect'     => base_url . '/tsberikanvoucher'
+                    ),
+                    //BMI
+                    'erma' => array(
+                        'tokomerchant' => 'customer',
+                        'level'        => 'giver',
+                        'redirect'     => base_url . '/tsberikanvoucher'
+                    ),
+                );
+
+                $username = $result['data']['username'];
+
+                // 4. Jika user ada di mapping → gunakan setting, jika tidak → default full access
+                if (isset($userConfig[$username])) {
+                    $_SESSION['tokomerchant'] = $userConfig[$username]['tokomerchant'];
+                    $_SESSION['level']        = $userConfig[$username]['level'];
+                    header('Location: ' . $userConfig[$username]['redirect']);
+                } else {
+                    // Default jika user tidak di-mapping khusus
+                    header('Location: ' . base_url . '/login');
+                    exit;
+                }
+
 
         exit; // hentikan eksekusi setelah redirect
     }

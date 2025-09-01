@@ -99,6 +99,7 @@ $username = $data['username'];
     <div class ="col-md-12 col-12">
             <!-- Default box -->
             <div class="card">
+              <input type="hidden" class="control-form" id="username" value="<?=$username?>">
       <div class="card-body">
        <div id="root"></div>
 

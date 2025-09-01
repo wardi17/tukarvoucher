@@ -258,6 +258,15 @@ public function getcabang(){
 
 
     public function listdata(){
+     
+        $toko  =$_SESSION['tokomerchant'];
+        $username =  $_SESSION['username'] ;
+
+        $kodeisi ="";
+        if($toko !== "full"){
+            $kodeisi =" WHERE User_kasih_voucher ='{$username}'";
+        }
+        
         try {
             $query = "SELECT 
                         ts.Kode_Berikan,
@@ -280,6 +289,7 @@ public function getcabang(){
                         {$this->table_ts} ts
                     LEFT JOIN 
                         {$this->table_tsdtl} tsd ON ts.Kode_Berikan = tsd.Kode_Berikan
+                     {$kodeisi}   
                     GROUP BY 
                         ts.Kode_Berikan, ts.cabang, ts.CustomerID,ts.CustName, ts.SOTransacID, 
                         ts.Jumlah_berikan_voucher, ts.Keterangan, 
@@ -287,7 +297,7 @@ public function getcabang(){
                     ORDER BY 
                         ts.Date_kasih_voucher DESC";
 
-              
+            //die(var_dump($query));
             $result = $this->db->baca_sql($query);
             $datas = [];
             while (odbc_fetch_row($result)) {

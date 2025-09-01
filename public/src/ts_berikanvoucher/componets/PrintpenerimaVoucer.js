@@ -75,50 +75,56 @@ class PrintpenerimaVoucer {
         fillColor: [255, 255, 255],
         textColor: [0, 0, 0]
       },
+       margin: { top: 20, left: 10, right: 10 },
       columnStyles: {
         0: { cellWidth: 12 },
-        1: { cellWidth: 150 }
+        // 1: { cellWidth:70}
       },
+       tableWidth: 'auto',
       theme: 'grid',
       didDrawPage: function (data) {
-        const pageCount = doc.internal.getNumberOfPages();
-        const pageCurrent = data.pageNumber;
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const pageText = `Halaman ${pageCurrent} dari ${pageCount}`;
-        doc.setFontSize(10);
-        doc.setFont(undefined, "italic");
-        doc.text(pageText, pageWidth - 35, 55, { align: "right" });
+          const pageCount = doc.internal.getNumberOfPages();
+          const pageCurrent = data.pageNumber;
+          const pageWidth = doc.internal.pageSize.getWidth();
+
+          // Tentukan posisi vertikal teks halaman
+          const posisiY = (pageCount === 1) ? 55 : 16;
+          const pageText = `Halaman ${pageCurrent} dari ${pageCount}`;
+          doc.setFontSize(10);
+          doc.setFont(undefined, "italic");
+          doc.text(pageText, pageWidth - 25, posisiY, { align: "right" });
       }
+
     });
 
     // 5. Footer: keterangan dan tanda tangan
-    const finalY = doc.lastAutoTable.finalY || 58;
-    const maxWidth = 150;
-    doc.text("Ket : ",14, finalY + 15);
-
-    // wrap isi keterangan saja
-      doc.setFontSize(12);
-
-      // label ditulis sekali
-      doc.text("Ket : ", 14, finalY + 15);
-
-      // wrap isi keterangan saja
-      const textLines = doc.splitTextToSize(keterangan, maxWidth);
+      let finalY = doc.lastAutoTable.finalY || 58;
+      const maxWidth = 150;
       const lineHeight = doc.getLineHeight() / doc.internal.scaleFactor;
-      doc.text(textLines, 14, finalY + 15 + lineHeight); 
-
-      // hitung tinggi untuk menentukan posisi teks berikutnya
+      const textLines = doc.splitTextToSize(keterangan, maxWidth);
       const keteranganHeight = textLines.length * lineHeight;
+      const footerHeight = 15 + lineHeight + keteranganHeight + 25 + 32; // total tinggi footer
 
-      // contoh: posisi tanda tangan otomatis di bawah keterangan
+      // Cek apakah footer muat di halaman sekarang
+      const pageHeight = doc.internal.pageSize.getHeight();
+      if (finalY + footerHeight > pageHeight - 10) {
+        doc.addPage();
+        finalY = 20; // mulai footer dari atas halaman baru
+      }
+
+      doc.setFontSize(12);
+      doc.text("Ket : ", 14, finalY + 15);
+      doc.text(textLines, 14, finalY + 15 + lineHeight);
+
+      // posisi tanda tangan
       const nextY = finalY + 15 + lineHeight + keteranganHeight + 5;
       doc.text("Hormat Kami,", 14, nextY);
-      doc.text(`(${username})`, 14, nextY + 20);
+      doc.text(`(${username})`, 14, nextY + 25);
 
+      doc.text("Received by", 150, nextY);
+      doc.text("(                    )", 150, nextY + 27);
+      doc.text(`${new Date().toLocaleDateString()}`, 152, nextY + 32);
 
-    doc.text("Received by", 150, nextY);
-    doc.text("(                    )", 150, nextY + 22);
-    doc.text(`${new Date().toLocaleDateString()}`, 152, nextY + 28);
 
     // 6. Preview PDF di iframe
     const pdfUrl = doc.output("bloburl");
