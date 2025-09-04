@@ -5,8 +5,9 @@ class PrintpenerimaVoucer {
   constructor(dataprint) {
     this.dataprint = dataprint;
     this.root = document.createElement('root');
+    this.button;
   }
-
+   
   async render() {
     const { custname, sotransacid, jumlah, keterangan, username, kode, date_berikan } = this.dataprint;
     const root = this.root;
@@ -21,7 +22,7 @@ class PrintpenerimaVoucer {
       unit: "mm",
       format: "A4"
     });
-
+   const totalPagesExp = "{total_pages_count_string}"; // <-- WAJIB: didefinisikan dulu
     // 3. Header PDF
     const pageWidth = doc.internal.pageSize.getWidth();  // biasanya 210 mm untuk A4 potrait
     doc.setFont("helvetica", "normal");
@@ -33,20 +34,21 @@ class PrintpenerimaVoucer {
     doc.setFontSize(12);
 
     doc.text("Nama", labelX, 30);
+  
     doc.text(":", valueX - 4, 30);
     doc.text(`${custname}`, valueX, 30);
 
-    doc.text("Tanggal", labelX, 38);
-    doc.text(":", valueX - 4, 38);
-    doc.text(`${date_berikan}`, valueX, 38);
+    doc.text("Tanggal", labelX, 36);
+    doc.text(":", valueX - 4, 36);
+    doc.text(`${date_berikan}`, valueX, 36);
 
-    doc.text("No SO", labelX, 44);
-    doc.text(":", valueX - 4, 44);
-    doc.text(`${sotransacid}`, valueX, 44);
+    doc.text("No SO", labelX, 42);
+    doc.text(":", valueX - 4, 42);
+    doc.text(`${sotransacid}`, valueX, 42);
 
-    doc.text("Jumlah", labelX, 50);
-    doc.text(":", valueX - 4, 50);
-    doc.text(`${jumlah}`, valueX, 50);
+    doc.text("Jumlah", labelX, 48);
+    doc.text(":", valueX - 4, 48);
+    doc.text(`${jumlah}`, valueX,48);
 
     // 4. Tabel data voucher
     const headers = [["No", "Kode Voucher"]];
@@ -87,15 +89,25 @@ class PrintpenerimaVoucer {
           const pageCurrent = data.pageNumber;
           const pageWidth = doc.internal.pageSize.getWidth();
 
+          //console.log(pageWidth)
+          let  pageText = "Halaman " + pageCurrent;
+          if(typeof doc.putTotalPages === 'function'){
+              pageText += " dari " + totalPagesExp;
+          }
           // Tentukan posisi vertikal teks halaman
           const posisiY = (pageCount === 1) ? 55 : 16;
-          const pageText = `Halaman ${pageCurrent} dari ${pageCount}`;
+     
           doc.setFontSize(10);
           doc.setFont(undefined, "italic");
-          doc.text(pageText, pageWidth - 25, posisiY, { align: "right" });
+          doc.text(pageText, pageWidth +27, posisiY, { align: "right" });
       }
 
     });
+
+    // Ganti placeholder dengan angka total halaman
+    if (typeof doc.putTotalPages === "function") {
+      doc.putTotalPages(totalPagesExp);
+    }
 
     // 5. Footer: keterangan dan tanda tangan
       let finalY = doc.lastAutoTable.finalY || 58;
@@ -123,7 +135,9 @@ class PrintpenerimaVoucer {
 
       doc.text("Received by", 150, nextY);
       doc.text("(                    )", 150, nextY + 27);
-      doc.text(`${new Date().toLocaleDateString()}`, 152, nextY + 32);
+  
+      const printDate = this.formatdateprint();
+      doc.text(`Print date : ${printDate}`, 140, nextY + 38);
 
 
     // 6. Preview PDF di iframe
@@ -159,8 +173,22 @@ class PrintpenerimaVoucer {
     root.appendChild(backBtn);
     root.appendChild(iframe);
 
+
     return root;
   }
+
+    formatdateprint=()=>{
+      const now = new Date();
+
+        const day = String(now.getDate()).padStart(2, '0');      // 01 - 31
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // 01 - 12
+        const year = now.getFullYear();
+        const time = now.toLocaleTimeString(); // 9:48:30 AM
+
+       return `${day}/${month}/${year} ${time}`;
+      
+    }
+
 
   async getdatadetailprint(datas) {
     return new Promise((resolve, reject) => {

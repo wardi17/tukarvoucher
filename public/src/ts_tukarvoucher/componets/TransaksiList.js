@@ -71,6 +71,7 @@ class TransaksiList {
     // List transaksi (dummy contoh)
     const list = document.createElement('div');
      const datalist = await this.getdatalist();
+    
      list.innerHTML = this.settable(datalist);
       // Aktifkan DataTables
     //list.innerHTML = '<p>Daftar isi transaksi akan muncul di sini...</p>';
@@ -93,6 +94,7 @@ class TransaksiList {
                                     <th class="col-md-2 text-start">No HP</th>
                                     <th class="col-md-2 text-start">Ket</th>
                                     <th class="col-md-2 text-start">Vouchers</th>
+                                    <th class="col-md-2 text-start">User</th>
                                    
                                 </tr>
                             </thead>
@@ -108,7 +110,6 @@ class TransaksiList {
 
   genereteTableRows(data){
 
-      console.log(data);
     if (!Array.isArray(data)) return `<tr><td colspan="6">Tidak ada data</td></tr>`;
     
     let hasil =``;
@@ -120,10 +121,10 @@ class TransaksiList {
             <td class="col-md-1 text-center">${index + 1}</td>
             <td class="col-md-2 text-start">${item.Date_tukar_voucher}</td>
             <td class="col-md-2 text-start">${item.CustomerName}</td>
-            <td class="col-md-2 text-start">${item.No_Hp}</td>
+            <td class="col-md-2 text-start">${item.NoTelp}</td>
             <td class="col-md-2 text-start">${item.Keterangan}</td>
             <td class="col-md-2 text-start">${item.Vouchers}</td>
-            
+            <td class="col-md-2 text-start">${item.User_tukar_voucher}</td>
      
         </tr>`;
     })

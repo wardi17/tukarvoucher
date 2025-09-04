@@ -5,7 +5,7 @@ class TsTukarVoucher extends Controller{
 
     private $userid;
     private $username;
-      
+    private $tokomerchant; 
     public function __construct()
 	{	
 	
@@ -19,6 +19,7 @@ class TsTukarVoucher extends Controller{
 		}else{
 			$this->userid = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : "";
 			$this->username =isset($_SESSION['username']) ? $_SESSION['username'] : "";
+			$this->tokomerchant =isset($_SESSION['tokomerchant']) ? $_SESSION['tokomerchant'] : "";
 			if (empty($this->userid) || empty($this->username)) {
 				header('location: '. base_url . '/login');
 				exit(); // Pastikan script berhenti setelah redirect
@@ -34,6 +35,7 @@ class TsTukarVoucher extends Controller{
     
         $data["userid"]= $this->userid;
         $data["username"]= $this->username;
+		$data["tokomerchant"]= $this->tokomerchant;
         $data["pages"]="tukar";
         $this->view('templates/header');
         $this->view('templates/sidebar', $data);

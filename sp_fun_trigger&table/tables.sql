@@ -16,7 +16,7 @@ USE [crm-bmi]
   );
 
   INSERT INTO ms_voucher (Kode_voucher, Jumlah_voucher, User_Input) VALUES
-  ('BFGF25P5N8',1,'admin'),
+('BFGF25P5N8',1,'admin'),
 ('BFGF253T8K',1,'admin'),
 ('BFGF25Z10N',1,'admin'),
 ('BFGF2562CP',1,'admin'),
@@ -81,7 +81,7 @@ USE [crm-bmi]
 ('BFGF2526VO',1,'admin'),
 ('BFGF25S7DB',1,'admin'),
 ('BFGF25PB5P',1,'admin'),
-('BFGF2520000000',1,'admin'),
+('BFGF25CJET',1,'admin'),
 ('BFGF25RBON',1,'admin'),
 ('BFGF25AJLS',1,'admin'),
 ('BFGF25MW5W',1,'admin'),
@@ -139,7 +139,12 @@ USE [crm-bmi]
     Date_posting DATETIME NULL
   );
 
+ ALTER TABLE  Ts_Berikan_Voucher
+ ADD Status_print CHAR(1) DEFAULT 'N',
+    User_print VARCHAR(100) NULL,
+    Date_print DATETIME NULL ;
 
+    
   --Table: Ts_Tukar_VoucherDetail
   CREATE TABLE Ts_Berikan_VoucherDetail(
     ID INT IDENTITY(1,1),

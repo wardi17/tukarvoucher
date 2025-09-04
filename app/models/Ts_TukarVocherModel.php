@@ -29,7 +29,6 @@ date_default_timezone_set('Asia/Jakarta');
         public function cekkodevoucher(){
             $input = json_decode(file_get_contents('php://input'), true);
 
-       
             $kodevoucher = isset($input['kodevoucher']) ? $input['kodevoucher'] : null;
   
             if (!$kodevoucher) {
@@ -42,7 +41,7 @@ date_default_timezone_set('Asia/Jakarta');
                 $kode = $this->findVoucher($this->table_tsdtl, $kodevoucher);
                 if ($kode) {
                     return [
-                        "status" => "used",
+                        "status" => "already",
                         "message" => "Kode voucher sudah ditukar dan tidak bisa digunakan lagi.",
                         "Kode_Voucher" => $kode
                     ];
@@ -124,8 +123,8 @@ date_default_timezone_set('Asia/Jakarta');
             $CustName = $this->test_input($post["custname"]);
             $notelpon = $this->test_input($post["notelpon"]);
             $Keterangan = $this->test_input($post["keterangan"]);
-            $User_tukar_voucher = $_SESSION['username'];
-            $TokoMerchant = $_SESSION['tokomerchant'];
+            $User_tukar_voucher =$this->test_input($post['username']);
+            $TokoMerchant =  $this->test_input($post["toko_merchant"]);
     
             $query = "INSERT INTO $this->table_ts (Kode_Tukar, Toko_merchant, CustomerName,NoTelp, Keterangan,User_tukar_voucher)
                       VALUES ('{$Kode_Tukar}', '{$TokoMerchant}', '{$CustName}','{$notelpon}','{$Keterangan}','{$User_tukar_voucher}')";
@@ -199,21 +198,15 @@ date_default_timezone_set('Asia/Jakarta');
                 a.Keterangan,
                 a.User_tukar_voucher,
                 a.Date_tukar_voucher,
-                (SELECT 
-                    STUFF(
-                        (SELECT ',' + LTRIM(RTRIM(b2.Kode_voucher))
-                        FROM $this->table_tsdtl b2
-                        WHERE b2.Kode_Tukar = a.Kode_Tukar
-                        ORDER BY b2.Kode_voucher
-                        FOR XML PATH(''))
-                    , 1, 1, '') AS Vouchers
-                ) AS Vouchers
+                ISNULL([crm-bmi].[dbo].ConcatVoucher(a.Kode_Tukar), '') AS Vouchers
             FROM 
                 $this->table_ts AS a 
-                 {$kodeisi}  
+                 {$kodeisi}   
             ORDER BY 
                 a.Date_tukar_voucher DESC;
             ";
+            
+            //$this->consol_war($query);
          
             $this->db->baca_sql("SET ARITHABORT ON");
             $result = $this->db->baca_sql($query);
@@ -243,6 +236,9 @@ date_default_timezone_set('Asia/Jakarta');
                 ];
             }
 
+            //
+            
+           // $this->consol_war($data);
             return $data;
             
         } catch (PDOException $e) {

@@ -47,9 +47,9 @@ class Login extends Controller
                         'redirect'     => base_url . '/home'
                     ),
                      'wardi' => array(
-                        'tokomerchant' => 'HC',
+                        'tokomerchant' => 'KK',
                         'level'        => 'redeemer',
-                        'redirect'     => base_url . '/home'
+                        'redirect'     => base_url . '/tstukarvoucher'
                     ),
 
                     'liana' => array(

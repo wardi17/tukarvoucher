@@ -4,7 +4,7 @@ $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? "https:/
 $host = $_SERVER['HTTP_HOST'];
 //$currentUrl = $protocol . $host;
 $currentUrl = $protocol . $host.'/wardibaset';
- define('base_url', $currentUrl.'/tukarvocher/public');
+ define('base_url', $currentUrl.'/voucher/public');
 //define('base_url',"http://192.168.11.186/live_streaming/");
  //define('base_url', $currentUrl.'/kampanye_teraden/public');
 define('FOLDER', '../public/uploads_attachfile/');

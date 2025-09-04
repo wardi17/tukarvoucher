@@ -1,8 +1,9 @@
 
 <?php
 
-$userlog = $data['userid'];
+$userid = $data['userid'];
 $username = $data['username'];
+$tokomerchant = $data["tokomerchant"];
 ?>
 <style>
 /* Hover effect & pointer */
@@ -100,6 +101,9 @@ $username = $data['username'];
             <!-- Default box -->
             <div class="card">
       <div class="card-body">
+          <input type="hidden" id="username" value="<?=$username?>"> 
+          <input type="hidden" id="userid" value="<?=$userid?>"> 
+        <input type="hidden" id="tokomerchant" value="<?=$tokomerchant?>"> 
        <div id="root"></div>
 
       </div>

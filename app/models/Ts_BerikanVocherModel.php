@@ -108,36 +108,59 @@ public function getcabang(){
     }
 }
     
+    private function findVoucher($table, $kodevoucher, $extraCondition = ''){
+        $where = "Kode_Voucher = '{$kodevoucher}'";
+          if (!empty($extraCondition)) {
+                    $where .= " AND {$extraCondition}";
+         }
+        $query = "SELECT Kode_Voucher FROM {$table} WHERE {$where}";
+        $sql = $this->db->baca_sql($query);
+        $kode =odbc_fetch_row($sql) ? odbc_result($sql, "Kode_Voucher") : false;
+        return $kode;
 
+    }
     public function cekkodevoucher(){
         $rawData = file_get_contents("php://input");
         $post = json_decode($rawData, true);
       //  $this->consol_war($post);
         $kodevoucher = $this->test_input($post["kodevoucher"]);
+
+       
+        if (!$kodevoucher) {
+                throw new InvalidArgumentException('Kode voucher is required');
+            }
         try {
+        // 1. Cek apakah voucher sudah pernah diberikan
 
-            $query = "SELECT Kode_Voucher 
-                    FROM $this->table_msvoucher 
-                    WHERE Kode_Voucher='{$kodevoucher}' AND jumlah_tukar_voucher = 1";
-            $sql = $this->db->baca_sql($query);
+             $kode = $this->findVoucher($this->table_tsdtl,$kodevoucher);
 
-            // Periksa apakah ada hasil
-            if (odbc_fetch_row($sql)) {
-                // Jika voucher ada
-                $kode = odbc_result($sql, "Kode_Voucher");
-                return [
-                    "status" => "ok",
-                    "message" => "Kode voucher ditemukan.",
-                    "Kode_Voucher" => $kode
-                ];
-            } else {
+          
+             if ($kode) {
+                    return [
+                        "status" => "already",
+                        "message" => "Kode voucher sudah dipakai dan tidak bisa dipakai lagi.",
+                        "Kode_Voucher" => $kode
+                    ];
+                }
+
+      
+        // 2. cek apakah voucher ada dimaster atau tidak di tabel ms_vocuher (jumlah_tukar_voucher='1')
+            $kode = $this->findVoucher($this->table_msvoucher , $kodevoucher, "jumlah_tukar_voucher = 1");   
+           if ($kode) {
+                    return [
+                        "status" => "ok",
+                        "message" => "Kode voucher ditemukan.",
+                        "Kode_Voucher" => $kode
+                    ];
+                }
+       
                 // Jika voucher tidak ada
                 return [
                     "status" => "not_found",
                     "message" => "Kode voucher tidak ditemukan atau sudah tidak berlaku.",
                     "Kode_Voucher" => null
                 ];
-            }
+        
 
         } catch (Exception $e) {
             error_log("Error in getAllInventaris: " . $e->getMessage());
@@ -284,6 +307,7 @@ public function getcabang(){
                         ts.User_kasih_voucher,
                         ts.Date_kasih_voucher,
                         ts.Status_posting,
+                        ts.Status_print,
                         COUNT(tsd.Kode_voucher) AS Jumlah_Voucher_Terpakai
                     FROM 
                         {$this->table_ts} ts
@@ -292,12 +316,12 @@ public function getcabang(){
                      {$kodeisi}   
                     GROUP BY 
                         ts.Kode_Berikan, ts.cabang, ts.CustomerID,ts.CustName, ts.SOTransacID, 
-                        ts.Jumlah_berikan_voucher, ts.Keterangan, 
-                        ts.User_kasih_voucher, ts.Date_kasih_voucher,ts.Status_posting
+                        ts.Jumlah_berikan_voucher,ts.Keterangan,
+                        ts.User_kasih_voucher, ts.Date_kasih_voucher,ts.Status_posting,ts.Status_print
                     ORDER BY 
                         ts.Date_kasih_voucher DESC";
 
-            //die(var_dump($query));
+   
             $result = $this->db->baca_sql($query);
             $datas = [];
             while (odbc_fetch_row($result)) {
@@ -312,6 +336,7 @@ public function getcabang(){
                 $Date_kasih_voucher = rtrim(odbc_result($result, 'Date_kasih_voucher'));
                 $Jumlah_Voucher_Terpakai = odbc_result($result, 'Jumlah_Voucher_Terpakai');
                 $Status_posting = rtrim(odbc_result($result, 'Status_posting'));
+                $Status_print = rtrim(odbc_result($result, 'Status_print'));
                   $time = strtotime($Date_kasih_voucher);
                     $formattedDate = $time ? date('d-m-y', $time) : null;
                      $date_berikan = $time ? date('d/m/Y', $time) : null;
@@ -328,6 +353,7 @@ public function getcabang(){
                     "date_berikan"=>$date_berikan,
                     "Jumlah_Voucher_Terpakai" => $Jumlah_Voucher_Terpakai,
                     "Status_posting" => $Status_posting,
+                    "Status_print"=>$Status_print,
                     "username" => $_SESSION['username']
                 ];
             }       
@@ -376,10 +402,10 @@ public function getcabang(){
         $post = json_decode($rawData, true);
         $Kode_Berikan = $this->test_input($post["kode"]);
         $User_posting = $_SESSION['username'];
-        $dateposting = date('Y-m-d H:i:s'); // Format tanggal dan waktu saat ini
+        $Date_print = date('Y-m-d H:i:s'); // Format tanggal dan waktu saat ini
             
         try {
-            $query = "UPDATE {$this->table_ts} SET Status_posting ='Y',User_posting='{$User_posting}', Date_posting='{$dateposting}' WHERE Kode_Berikan = '{$Kode_Berikan}'";
+            $query = "UPDATE {$this->table_ts} SET Status_posting ='Y',User_posting='{$User_posting}', Date_print='{$Date_print}' WHERE Kode_Berikan = '{$Kode_Berikan}'";
             // $this->consol_war($query);
             if ($this->db->baca_sql($query)) {
                 return ['nilai' => 1, 'error' => 'Berhasil Posting Data'];
@@ -394,6 +420,27 @@ public function getcabang(){
 
     }
    
+
+    public function UpdateSatusPrint(){
+          $rawData = file_get_contents("php://input");    
+        $post = json_decode($rawData, true);
+        $Kode_Berikan = $this->test_input($post["kode"]);
+        $User_print = $_SESSION['username'];
+        $Date_print = date('Y-m-d H:i:s'); // Format tanggal dan waktu saat ini
+            
+        try {
+            $query = "UPDATE {$this->table_ts} SET Status_print ='Y',User_print='{$User_print}', Date_posting='{$Date_print}' WHERE Kode_Berikan = '{$Kode_Berikan}'";
+             //$this->consol_war($query);
+            if ($this->db->baca_sql($query)) {
+                return ['nilai' => 1, 'error' => 'Berhasil update status print '];
+            } else {
+                return ['nilai' => 0, 'error' => 'Gagal update status print'];
+            }
+        } catch (Exception $e) {
+            error_log("Error in postingdata: " . $e->getMessage());
+            return ['nilai' => 0, 'error' => 'Terjadi kesalahan saat memproses data.'];
+        }
+    }
 
 
     public function getdatadetailprint(){

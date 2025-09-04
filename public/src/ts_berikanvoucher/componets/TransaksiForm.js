@@ -114,7 +114,7 @@ class TransaksiForm {
       <div class="row mb-3 align-items-center">
         <label for="kodevoucher" class="col-sm-1 col-form-label pe-0">Kode Voucher</label>
         <div class="col-sm-3 d-flex">
-          <input type="text" id="kodevoucher" class="form-control" />
+          <input type="text" id="kodevoucher" class="form-control" style="text-transform: uppercase;" />
           <button type="button" id="addvoucher" class="btn btn-info ms-2">+</button>
         </div>
         <div class="col-sm-4">
@@ -313,17 +313,24 @@ validateInput(inputSelector, errorSelector, errorMessage) {
           
           if (!result.error) {
             // tampilkan pesan berdasarkan status
-            if (datas.status === "ok") {
+            if(datas.status ==="already"){
+               $("#kodevoucherError")
+                .removeClass("text-success")
+                .addClass("error")
+                .text(datas.message);
+                 resolve(false);
+            }
+            else if (datas.status === "ok") {
               $("#kodevoucherError")
                 .removeClass("error")
                 .addClass("text-success")
-                .html(`${datas.message || "Kode voucher valid"} <span class="icon-check">&#10004;</span>`); 
+                .html(`${datas.message} <span class="icon-check">&#10004;</span>`); 
               resolve(datas);
             } else if (datas.status === "not_found") {
               $("#kodevoucherError")
                 .removeClass("text-success")
                 .addClass("error")
-                .text(datas.message || "Kode voucher tidak ditemukan.");
+                .text(datas.message);
               resolve(false);
             } else if (datas.status === "error") {
               $("#kodevoucherError")
@@ -371,8 +378,7 @@ tomboladdketable() {
         
         // Validasi kode voucher
         const cekvoucher = await this.cekkodeVoucher(kodevoucher);
-        if (!cekvoucher || cekvoucher.status !== "ok") {
-            $("#kodevoucherError").text('Kode voucher tidak valid atau tidak ditemukan.');
+        if (!cekvoucher) {
             return;
         }
 

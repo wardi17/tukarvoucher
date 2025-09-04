@@ -134,5 +134,28 @@ class TukarVocherController extends Controller
         }
     //end kode baru
 
+
+
+    public function gettokomerchat(){
+        
+    
+
+          try {       
+        // Retrieve data from the model
+                $data =[
+                        'HC','KK','MB','BTOUR','BMN'
+                    ];                // Check if data is empty
+                if (empty($data)) {
+                    $this->sendJsonResponse([], 200); // Return an empty array if no data found
+                    return;
+                }
+
+                // Send the data as a JSON response
+                $this->sendJsonResponse($data, 200);
+            } catch (Throwable $e) {
+                error_log('Error in TukarVocherController::getdatadetailprint: ' . $e->getMessage());
+                $this->sendErrorResponse('Internal server error', 500);
+            }  
+    }
    
 }

@@ -46,7 +46,9 @@ class TransaksiForm {
     // Set isi form
     this.setFormContent();
 
-
+    //tampil merchat
+     this.getTokoMerchat();
+    //and tampil merchat
 
     // Validasi input 
     this.keypresinput();
@@ -70,6 +72,15 @@ class TransaksiForm {
         </div>
       </div>
     
+        <div class="row mb-3">
+        <label for="Toko_merchant" class="col-sm-1 col-form-label pe-0">Merchant</label>
+        <div class="col-sm-3">
+          <select id="Toko_merchant" name="Toko_merchant" class="form-select">
+            <option value="">Memuat...</option>
+          </select>
+          <span id="Toko_merchantError" class="error"></span>
+        </div>
+      </div>
       <div class="row mb-3">
         <label for="custname" class="col-sm-1 col-form-label pe-0">Nama</label>
         <div class="col-sm-3">
@@ -94,7 +105,7 @@ class TransaksiForm {
       <div class="row mb-3 align-items-center">
         <label for="kodevoucher" class="col-sm-1 col-form-label pe-0">Kode Voucher</label>
         <div class="col-sm-3 d-flex">
-          <input type="text" id="kodevoucher" class="form-control" />
+          <input type="text" id="kodevoucher" class="form-control" style="text-transform: uppercase;"/>
           <button type="button" id="addvoucher" class="btn btn-info ms-2">+</button>
         </div>
         <div class="col-sm-4">
@@ -122,10 +133,65 @@ class TransaksiForm {
   }
 
 
+//tampilgetokoMerchat
+   async getTokoMerchat(){
+    const selectElement = this.form.querySelector("#Toko_merchant");
+    const tokomerchant  = document.getElementById("tokomerchant").value;
 
+    selectElement.innerHTML = '<option disable value="">-- Memuat... --</option>';
+     try{
+        if(tokomerchant !=="full"){
+                  selectElement.disabled = true;
+                  selectElement.innerHTML = `<option selected  value="${tokomerchant}">${tokomerchant}</option>`;
+        }else{
+        const datatoko = await this.TokoMerchat();
+        datatoko.forEach(item =>{
+          const option = document.createElement('option');
+          option.value =item;
+          option.textContent = item;
+          selectElement.appendChild(option);
+        })
+
+        }
+    
+       } catch (error) {
+        console.log('Gagal memuat  Merchat:', error);
+        selectElement.innerHTML = '<option value="">-- Gagal memuat data --</option>';
+      }
+
+      $("#Toko_merchant").select2({
+          theme: "bootstrap-5",
+        });
+  }
+
+  async TokoMerchat(){
+     return new Promise((resolve, reject) => {
+      $.ajax({
+        url: `${baseUrl}/router/seturl`,
+        method: "GET",
+        dataType: "json",
+        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+        headers: { 'url': 'vouchertukar/gettokomerchat' },
+        success: (result) => {
+          const datas = result.data;
+          if (!result.error) {
+            resolve(datas);
+          } else {
+            reject(new Error(result.error || "Unexpected response format"));
+          }
+        },
+        error: (jqXHR) => {
+          const errorMessage = jqXHR.responseJSON?.error || "Failed to fetch data";
+          reject(new Error(errorMessage));
+        }
+      });
+    });
+  }
+//and tampilgettokomerchat
 
 
   keypresinput() {
+    this.validateInput("#Toko_merchant", "#Toko_merchantError", "toko merchat harus di pilih");
     this.validateInput("#custname", "#custnameError", "name harus di isi");
  
   }
@@ -165,7 +231,10 @@ validateInput(inputSelector, errorSelector, errorMessage) {
   cekkodeVoucher(kodevoucher) {
     return new Promise((resolve, reject) => {
       if (!kodevoucher) {
-        $("#kodevoucherError").text("Kode voucher harus diisi");
+        $("#kodevoucherError")
+        .removeClass("text-success")
+         .addClass("error")
+        .text("Kode voucher harus diisi");
         resolve(false);
         return;
       }
@@ -182,17 +251,23 @@ validateInput(inputSelector, errorSelector, errorMessage) {
           
           if (!result.error) {
             // tampilkan pesan berdasarkan status
-            if (datas.status === "ok") {
+            if(datas.status ==="already"){
+               $("#kodevoucherError")
+                .removeClass("text-success")
+                .addClass("error")
+                .text(datas.message);
+                 resolve(false);
+            }else if (datas.status === "ok") {
               $("#kodevoucherError")
                 .removeClass("error")
                 .addClass("text-success")
-                .html(`${datas.message || "Kode voucher valid"} <span class="icon-check">&#10004;</span>`); 
+                .html(`${datas.message} <span class="icon-check">&#10004;</span>`); 
               resolve(datas);
             } else if (datas.status === "not_found") {
               $("#kodevoucherError")
                 .removeClass("text-success")
                 .addClass("error")
-                .text(datas.message || "Kode voucher tidak ditemukan.");
+                .text(datas.message);
               resolve(false);
             } else if (datas.status === "error") {
               $("#kodevoucherError")
@@ -240,8 +315,7 @@ tomboladdketable() {
         
         // Validasi kode voucher
         const cekvoucher = await this.cekkodeVoucher(kodevoucher);
-        if (!cekvoucher || cekvoucher.status !== "ok") {
-            $("#kodevoucherError").text('Kode voucher tidak valid atau tidak ditemukan.');
+        if (!cekvoucher) {
             return;
         }
 
@@ -329,9 +403,10 @@ tomboladdketable() {
   simpanData(){
     $(document).on("click", "#Simpdandata", async (event) => {
       event.preventDefault();
-
       // Ambil nilai dari form
-     
+      const username     = document.getElementById("username").value.trim();
+      const userid       = document.getElementById("userid").value.trim();
+      const Toko_merchant = this.form.querySelector("#Toko_merchant").value.trim();
       const custname = this.form.querySelector("#custname").value.trim();
       const notelpon = this.form.querySelector("#notelpon").value.trim();
       const keterangan = this.form.querySelector("#keterangan").value.trim();
@@ -339,6 +414,12 @@ tomboladdketable() {
       
       let isValid = true;
 
+      if (!Toko_merchant) {
+        $("#Toko_merchantError").text("toko merchat harus di pilih");
+        isValid = false;
+      } else {
+        $("#Toko_merchantError").text("");
+      }
       if (!custname) {
         $("#custnameError").text("nama harus diisi");
         isValid = false;
@@ -368,7 +449,9 @@ tomboladdketable() {
 
       // Siapkan data untuk dikirim ke backend
       const postData = {
-    
+        userid:userid,
+        username:username,
+        toko_merchant:Toko_merchant,
         custname: custname,
         notelpon: notelpon,
         keterangan: keterangan,
